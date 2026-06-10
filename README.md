@@ -74,4 +74,10 @@ The repo configures two layers:
 - `~/.config/opencode/opencode.json` sets `share` to `disabled` and `experimental.openTelemetry` to `false`.
 - `~/.zshrc` exports `DO_NOT_TRACK=1` and `OPENCODE_DISABLE_SHARE=1`.
 
+The global opencode config also sets conservative permissions:
+
+- Ask before edits and most shell commands.
+- Allow a small set of exact read-only git inspection commands like `git status`, `git diff`, and `git log`.
+- Deny model/tool access to common secret-bearing directories like `~/.ssh`, `~/.aws`, `~/.config/gh`, `~/.codex`, and `~/.opencode`.
+
 Restart opencode after installing these dotfiles so it reloads the config.
