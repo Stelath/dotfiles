@@ -1,0 +1,8 @@
+brew "fzf"
+brew "gh"
+brew "go"
+brew "kubernetes-cli"
+brew "neovim"
+brew "nvm"
+brew "starship"
+brew "zsh-autosuggestions"

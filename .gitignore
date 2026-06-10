@@ -1,0 +1,24 @@
+.DS_Store
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Local secrets and machine state
+.env
+.env.*
+!.env.example
+auth.json
+installation_id
+session_index.jsonl
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Dependency and cache directories
+node_modules/
+.cache/
+.tmp/
+tmp/
+sessions/
+logs/
