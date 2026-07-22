@@ -62,10 +62,36 @@ install_nvm() {
     info "nvm already installed"
   fi
 
+  # --no-use: plain sourcing auto-runs `nvm use` against any .nvmrc in the
+  # cwd (this repo has one), which exits non-zero before node is installed.
   # shellcheck disable=SC1091
-  . "$NVM_DIR/nvm.sh"
+  . "$NVM_DIR/nvm.sh" --no-use
   nvm install --lts
   nvm alias default 'lts/*'
+}
+
+link_node_system() {
+  # Dev pods run as root on Linux: link nvm's default node into
+  # /usr/local/bin so every context (non-interactive shells, editors,
+  # kubectl exec) resolves the same node/npm — no second npm.
+  if [ "$(uname -s)" != "Linux" ] || [ "$(id -u)" != "0" ]; then
+    return 0
+  fi
+
+  local node_path bin_dir tool
+  node_path="$(nvm which default 2>/dev/null)" || true
+  if [ -z "${node_path:-}" ] || [ ! -x "$node_path" ]; then
+    info "No nvm default node to link system-wide; skipping."
+    return 0
+  fi
+  bin_dir="$(dirname "$node_path")"
+
+  for tool in node npm npx corepack; do
+    if [ -x "$bin_dir/$tool" ]; then
+      ln -sfn "$bin_dir/$tool" "/usr/local/bin/$tool"
+    fi
+  done
+  info "Linked nvm node ($bin_dir) into /usr/local/bin"
 }
 
 install_codex() {
@@ -235,6 +261,7 @@ main() {
 
   if [ "${INSTALL_NODE:-1}" != "0" ]; then
     install_nvm || info "WARN: nvm/node install failed"
+    link_node_system || info "WARN: linking node system-wide failed"
   fi
 
   if [ "${INSTALL_CODEX:-1}" != "0" ]; then
